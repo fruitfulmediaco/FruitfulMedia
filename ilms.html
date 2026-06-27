@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruitful Media - ILMS Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0a1929 50%, #000000 100%);
+        }
+        
+        .glow-cyan {
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+        
+        .border-glow {
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .border-glow:hover {
+            border-color: #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-backdrop {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .ad-banner {
+            background: linear-gradient(90deg, rgba(139, 69, 19, 0.6) 0%, rgba(184, 134, 11, 0.6) 100%);
+            border: 1px solid rgba(184, 134, 11, 0.4);
+        }
+        
+        .card-movie {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card-movie:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div id="app">
+        <!-- Top Ad Banner (Free Tier Only) -->
+        <div id="topAdBanner" class="ad-banner p-4 text-center border-b hidden">
+            <p class="text-sm">🎬 <strong>Advertisement:</strong> Stream unlimited movies with premium streaming service - Get started free today!</p>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="bg-black bg-opacity-80 border-b border-cyan-500 border-opacity-20 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center font-bold text-lg">
+                        FM
+                    </div>
+                    <span class="text-2xl font-bold gradient-text">Fruitful ILMS</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <span id="tierBadge" class="px-4 py-2 bg-red-600 bg-opacity-30 border border-red-500 border-opacity-50 rounded-full text-xs font-bold">FREE TIER</span>
+                    <button id="premiumBtn" class="gradient-btn px-6 py-2 rounded-full text-black font-bold text-sm">
+                        UPGRADE ($1.99)
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Premium Upgrade Banner -->
+        <div id="premiumBanner" class="bg-gradient-to-r from-amber-900 to-amber-800 border-b-2 border-amber-500 p-6 text-center">
+            <h2 class="text-2xl font-bold mb-2">🍿 Tired of Ads?</h2>
+            <p class="mb-4 text-amber-100">Upgrade to <strong>Premium for just $1.99/month</strong> and enjoy unlimited ad-free streaming!</p>
+            <button id="upgradePremiumBtn" class="gradient-btn px-8 py-3 rounded-lg text-black font-bold hover:scale-105 transition">
+                REMOVE ADS - UPGRADE NOW
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <!-- Hero Section -->
+            <div class="mb-12">
+                <h1 class="text-5xl font-black mb-3 gradient-text">Featured Movies</h1>
+                <p class="text-gray-400 text-lg">Explore our curated collection of independent and premium films</p>
+            </div>
+
+            <!-- Movie Grid -->
+            <div id="movieGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <!-- Movies will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Bottom Ad Banner (Free Tier Only) -->
+        <div id="bottomAdBanner" class="ad-banner p-4 text-center border-t mt-12 hidden">
+            <p class="text-sm">📺 <strong>Advertisement:</strong> Don't miss out! Subscribe to our premium content library now.</p>
+        </div>
+
+        <!-- Movie Player Modal -->
+        <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-50 modal-backdrop p-4">
+            <div class="bg-gray-900 border border-cyan-500 border-opacity-30 rounded-xl max-w-4xl w-full">
+                <!-- Pre-roll Ad (Free Tier Only) -->
+                <div id="prerollAd" class="bg-gray-800 p-8 text-center border-b border-cyan-500 border-opacity-20 hidden">
+                    <h3 class="text-xl font-bold mb-4">Advertisement</h3>
+                    <div class="ad-banner p-6 rounded mb-4">
+                        <p class="mb-4">Experience premium streaming - limited time offer inside!</p>
+                        <p class="text-2xl font-bold text-amber-400">SKIP IN <span id="adTimer">5</span>s</p>
+                    </div>
+                </div>
+
+                <!-- Video Player -->
+                <div class="bg-black aspect-video flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-cyan-500 to-blue-600 opacity-10"></div>
+                    <div class="text-center z-10">
+                        <div class="text-6xl mb-4">🎬</div>
+                        <p id="movieTitle" class="text-2xl font-bold mb-2">Movie Title</p>
+                        <p class="text-gray-400">Video Player</p>
+                        <p class="text-sm text-gray-500 mt-4">Click close to exit</p>
+                    </div>
+                </div>
+
+                <!-- Movie Info -->
+                <div class="p-6">
+                    <h2 id="movieName" class="text-2xl font-bold mb-3">Movie Title</h2>
+                    <p id="movieDesc" class="text-gray-400 mb-6">Movie description goes here...</p>
+                    <div class="flex gap-4">
+                        <button onclick="closePlayerModal()" class="flex-1 px-6 py-3 border border-red-500 text-red-500 font-bold rounded-lg hover:bg-red-500 hover:text-black transition">
+                            CLOSE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        let appState = {
+            isPremium: false,
+            currentMovie: null,
+            adTimeRemaining: 5,
+            movies: [
+                {
+                    id: 1,
+                    title: "Neon Dreams",
+                    genre: "Sci-Fi Drama",
+                    description: "A visionary journey through a cyberpunk dystopia where technology meets humanity.",
+                    poster: "🌃"
+                },
+                {
+                    id: 2,
+                    title: "Silent Echoes",
+                    genre: "Thriller",
+                    description: "A gripping tale of secrets, betrayal, and the price of truth.",
+                    poster: "🎭"
+                },
+                {
+                    id: 3,
+                    title: "Cosmic Horizons",
+                    genre: "Adventure",
+                    description: "Epic space exploration and the search for humanity's place in the universe.",
+                    poster: "🚀"
+                },
+                {
+                    id: 4,
+                    title: "The Last Frame",
+                    genre: "Documentary",
+                    description: "A compelling documentary about the evolution of cinema and storytelling.",
+                    poster: "🎞️"
+                },
+                {
+                    id: 5,
+                    title: "Urban Legends",
+                    genre: "Horror",
+                    description: "Street legends come to life in this modern take on urban folklore.",
+                    poster: "👻"
+                },
+                {
+                    id: 6,
+                    title: "The Art of Silence",
+                    genre: "Drama",
+                    description: "A powerful story about communication beyond words.",
+                    poster: "🎨"
+                },
+                {
+                    id: 7,
+                    title: "Quantum Leap",
+                    genre: "Action",
+                    description: "High-octane adventure through parallel dimensions and time.",
+                    poster: "⚡"
+                },
+                {
+                    id: 8,
+                    title: "Homage",
+                    genre: "Animation",
+                    description: "A breathtaking animated journey celebrating the art of filmmaking.",
+                    poster: "🎬"
+                }
+            ]
+        };
+
+        // ==================== UI RENDERING ====================
+        function renderUI() {
+            updateTierBadge();
+            updateAdVisibility();
+            renderMovieGrid();
+        }
+
+        function updateTierBadge() {
+            const badge = document.getElementById('tierBadge');
+            const premiumBtn = document.getElementById('premiumBtn');
+            
+            if (appState.isPremium) {
+                badge.textContent = 'PREMIUM MEMBER';
+                badge.className = 'px-4 py-2 bg-green-600 bg-opacity-30 border border-green-500 border-opacity-50 rounded-full text-xs font-bold';
+                premiumBtn.textContent = 'PREMIUM ACTIVE ✓';
+                premiumBtn.disabled = true;
+            } else {
+                badge.textContent = 'FREE TIER';
+                badge.className = 'px-4 py-2 bg-red-600 bg-opacity-30 border border-red-500 border-opacity-50 rounded-full text-xs font-bold';
+                premiumBtn.textContent = 'UPGRADE ($1.99)';
+                premiumBtn.disabled = false;
+            }
+        }
+
+        function updateAdVisibility() {
+            const topAd = document.getElementById('topAdBanner');
+            const bottomAd = document.getElementById('bottomAdBanner');
+            const premiumBanner = document.getElementById('premiumBanner');
+
+            if (appState.isPremium) {
+                topAd.classList.add('hidden');
+                bottomAd.classList.add('hidden');
+                premiumBanner.classList.add('hidden');
+            } else {
+                topAd.classList.remove('hidden');
+                bottomAd.classList.remove('hidden');
+                premiumBanner.classList.remove('hidden');
+            }
+        }
+
+        function renderMovieGrid() {
+            const grid = document.getElementById('movieGrid');
+            grid.innerHTML = '';
+
+            appState.movies.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'card-movie border-glow bg-gray-900 rounded-lg overflow-hidden';
+                card.innerHTML = `
+                    <div class="bg-gradient-to-br from-cyan-500 to-blue-600 h-64 flex items-center justify-center text-7xl">
+                        ${movie.poster}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1">${movie.title}</h3>
+                        <p class="text-xs text-cyan-400 mb-3">${movie.genre}</p>
+                        <p class="text-sm text-gray-400 mb-4">${movie.description}</p>
+                        <button onclick="playMovie(${movie.id})" class="w-full gradient-btn text-black py-2 rounded font-bold text-sm">
+                            WATCH NOW
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ==================== MOVIE PLAYER LOGIC ====================
+        function playMovie(movieId) {
+            const movie = appState.movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            appState.currentMovie = movie;
+            const modal = document.getElementById('playerModal');
+            const prerollAd = document.getElementById('prerollAd');
+
+            // Set movie details
+            document.getElementById('movieTitle').textContent = movie.title;
+            document.getElementById('movieName').textContent = movie.title;
+            document.getElementById('movieDesc').textContent = movie.description;
+
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Show pre-roll ad if free tier
+            if (!appState.isPremium) {
+                prerollAd.classList.remove('hidden');
+                startAdTimer();
+            } else {
+                prerollAd.classList.add('hidden');
+            }
+        }
+
+        function closePlayerModal() {
+            const modal = document.getElementById('playerModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            appState.adTimeRemaining = 5;
+        }
+
+        function startAdTimer() {
+            appState.adTimeRemaining = 5;
+            const timer = setInterval(() => {
+                appState.adTimeRemaining--;
+                document.getElementById('adTimer').textContent = appState.adTimeRemaining;
+
+                if (appState.adTimeRemaining <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('prerollAd').classList.add('hidden');
+                }
+            }, 1000);
+        }
+
+        // ==================== PREMIUM UPGRADE ====================
+        function upgradeToPremium() {
+            appState.isPremium = true;
+            renderUI();
+            
+            // Show notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-6 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg fade-in z-50';
+            notification.textContent = '✓ Upgraded to Premium! All ads removed.';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('premiumBtn').addEventListener('click', upgradeToPremium);
+        document.getElementById('upgradePremiumBtn').addEventListener('click', upgradeToPremium);
+
+        // Close modal when clicking outside
+        document.getElementById('playerModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('playerModal')) {
+                closePlayerModal();
+            }
+        });
+
+        // Initial render
+        renderUI();
+    </script>
+</body>
+</html>
